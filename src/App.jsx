@@ -9,6 +9,8 @@ import {
   ArrowLeft,
   CheckCircle,
   Info,
+  MessageSquare,
+  HelpCircle,
 } from 'lucide-react';
 
 // ==================== DATABASE SCHEMA ====================
@@ -423,6 +425,23 @@ const STRINGS = {
     bathroomGuidedTitle: 'مروحة للحمام',
     industrialGuidedTitle: 'صناعي',
     findFans: 'ابحث عن المراوح',
+    tabSelector: 'اختيار المروحة',
+    tabInquiry: 'إرسال استفسار',
+    inquiryTitle: 'إرسال استفسار',
+    inquirySubtitle: 'تحتاج إلى مزيد من المعلومات؟ أرسل لنا أسئلتك أو متطلباتك.',
+    inquiryNameLabel: 'الاسم',
+    inquiryEmailLabel: 'البريد الإلكتروني',
+    inquiryPhoneLabel: 'الهاتف (اختياري)',
+    inquirySubjectLabel: 'الموضوع',
+    inquiryMessageLabel: 'الرسالة',
+    inquiryPlaceholderName: 'اسمك',
+    inquiryPlaceholderEmail: 'your@email.com',
+    inquiryPlaceholderPhone: '+1234567890',
+    inquiryPlaceholderSubject: 'مثال: استفسار عن مروحة بدون محرك',
+    inquiryPlaceholderMessage: 'اوصف متطلباتك أو أسئلتك أو المواصفات...',
+    inquirySendButton: 'إرسال الاستفسار',
+    inquirySuccess: 'تم إرسال الاستفسار بنجاح! سنعود إليك قريباً.',
+    inquiryRequired: 'يرجى ملء جميع الحقول المطلوبة.',
   },
 };
 
@@ -431,6 +450,7 @@ const useT = (lang) => (key) =>
 
 // ==================== MAIN APP COMPONENT ====================
 export default function FanSelectionApp() {
+  const [currentTab, setCurrentTab] = useState('selector'); // 'selector' | 'inquiry'
   const [step, setStep] = useState(1);
   const [lang, setLang] = useState('en'); // 'en' | 'ar'
   const [userName, setUserName] = useState('');
@@ -453,6 +473,13 @@ export default function FanSelectionApp() {
   const [recommendations, setRecommendations] = useState([]);
   const [requirementSummary, setRequirementSummary] = useState(null);
   const [followUpMessage, setFollowUpMessage] = useState('');
+  const [inquiryForm, setInquiryForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: '',
+  });
 
   // Calculate required airflow based on room volume and category
   const calculateRequirements = () => {
@@ -697,6 +724,123 @@ export default function FanSelectionApp() {
     );
   };
 
+  // ==================== INQUIRY PAGE COMPONENT ====================
+  const InquiryPage = () => {
+    const handleInquirySubmit = () => {
+      if (!inquiryForm.name || !inquiryForm.email || !inquiryForm.subject || !inquiryForm.message) {
+        window.alert(t('inquiryRequired'));
+        return;
+      }
+      // Placeholder submission
+      window.alert(t('inquirySuccess'));
+      setInquiryForm({
+        name: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: '',
+      });
+    };
+
+    return (
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-20">
+        <div className="flex items-center gap-3 mb-4">
+          <MessageSquare className="w-8 h-8 text-blue-600" />
+          <h2 className="text-2xl font-bold">{t('inquiryTitle')}</h2>
+        </div>
+        <p className="text-gray-600 mb-6">{t('inquirySubtitle')}</p>
+
+        <div className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold mb-2">
+                {t('inquiryNameLabel')} *
+              </label>
+              <input
+                type="text"
+                value={inquiryForm.name}
+                onChange={(e) =>
+                  setInquiryForm({ ...inquiryForm, name: e.target.value })
+                }
+                className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 outline-none"
+                placeholder={t('inquiryPlaceholderName')}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-2">
+                {t('inquiryEmailLabel')} *
+              </label>
+              <input
+                type="email"
+                value={inquiryForm.email}
+                onChange={(e) =>
+                  setInquiryForm({ ...inquiryForm, email: e.target.value })
+                }
+                className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 outline-none"
+                placeholder={t('inquiryPlaceholderEmail')}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold mb-2">
+              {t('inquiryPhoneLabel')}
+            </label>
+            <input
+              type="tel"
+              value={inquiryForm.phone}
+              onChange={(e) =>
+                setInquiryForm({ ...inquiryForm, phone: e.target.value })
+              }
+              className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 outline-none"
+              placeholder={t('inquiryPlaceholderPhone')}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold mb-2">
+              {t('inquirySubjectLabel')} *
+            </label>
+            <input
+              type="text"
+              value={inquiryForm.subject}
+              onChange={(e) =>
+                setInquiryForm({ ...inquiryForm, subject: e.target.value })
+              }
+              className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 outline-none"
+              placeholder={t('inquiryPlaceholderSubject')}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold mb-2">
+              {t('inquiryMessageLabel')} *
+            </label>
+            <textarea
+              value={inquiryForm.message}
+              onChange={(e) =>
+                setInquiryForm({ ...inquiryForm, message: e.target.value })
+              }
+              className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 outline-none"
+              rows="6"
+              placeholder={t('inquiryPlaceholderMessage')}
+            />
+          </div>
+
+          <div className="flex justify-center pt-4">
+            <button
+              onClick={handleInquirySubmit}
+              className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
+            >
+              <MessageSquare className="w-5 h-5" />
+              {t('inquirySendButton')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // ==================== RENDER ====================
   const t = useT(lang);
 
@@ -718,9 +862,10 @@ export default function FanSelectionApp() {
         }`}
         dir={lang === 'ar' ? 'rtl' : 'ltr'}
       >
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto pb-20">
           {/* Header */}
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          {currentTab === 'selector' && (
+            <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-3">
                 <Wind className="w-8 h-8 text-blue-600" />
@@ -779,7 +924,11 @@ export default function FanSelectionApp() {
               ))}
             </div>
           </div>
+          )}
 
+          {/* Main Content */}
+          {currentTab === 'selector' && (
+            <>
           {/* Step 1: Account */}
           {step === 1 && (
             <div className="bg-white rounded-lg shadow-lg p-6">
@@ -811,19 +960,19 @@ export default function FanSelectionApp() {
                   />
                 </div>
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-3 justify-center">
                 <button
                   onClick={() => {
                     if (!userName) setUserName(lang === 'ar' ? 'ضيف' : 'Guest');
                     setStep(2);
                   }}
-                  className="px-6 py-3 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center justify-center gap-2"
+                  className="px-6 py-2 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
                 >
                   {t('continueGuest')} <ArrowRight className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setStep(2)}
-                  className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
                   disabled={!userEmail}
                 >
                   {t('continueEmail')} <ArrowRight className="w-4 h-4" />
@@ -839,7 +988,10 @@ export default function FanSelectionApp() {
               <p className="text-gray-600 mb-6">{t('userTypeSubtitle')}</p>
               <div className="space-y-3 mb-6">
                 <button
-                  onClick={() => setUserType('expert')}
+                  onClick={() => {
+                    setUserType('expert');
+                    setStep(3);
+                  }}
                   className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
                     userType === 'expert'
                       ? 'border-blue-500 bg-blue-50'
@@ -852,7 +1004,10 @@ export default function FanSelectionApp() {
                   </div>
                 </button>
                 <button
-                  onClick={() => setUserType('guided')}
+                  onClick={() => {
+                    setUserType('guided');
+                    setStep(3);
+                  }}
                   className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
                     userType === 'guided'
                       ? 'border-blue-500 bg-blue-50'
@@ -872,12 +1027,6 @@ export default function FanSelectionApp() {
                 >
                   <ArrowLeft className="w-4 h-4" /> {t('back')}
                 </button>
-                <button
-                  onClick={() => setStep(3)}
-                  className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-                >
-                  {t('next')} <ArrowRight className="w-4 h-4" />
-                </button>
               </div>
             </div>
           )}
@@ -896,9 +1045,9 @@ export default function FanSelectionApp() {
                     <button
                       onClick={() => {
                         setMotorType('with');
-                        // Reset incompatible drive types when switching motor
-                        if (placeUseCase === 'industrial' && driveType !== 'direct') {
-                          setDriveType('');
+                        // Auto-select direct drive if industrial is already selected
+                        if (placeUseCase === 'industrial') {
+                          setDriveType('direct');
                         }
                       }}
                       className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
@@ -915,6 +1064,11 @@ export default function FanSelectionApp() {
                     <button
                       onClick={() => {
                         setMotorType('without');
+                        // Clear kitchen/bathroom selections as they're not available for "without motor"
+                        if (placeUseCase === 'kitchen' || placeUseCase === 'bathroom') {
+                          setPlaceUseCase('');
+                          setCategory('');
+                        }
                         // Reset incompatible drive types when switching motor
                         if (placeUseCase === 'industrial' && driveType === 'direct') {
                           setDriveType('');
@@ -937,7 +1091,7 @@ export default function FanSelectionApp() {
                   <div className="text-sm font-semibold mb-2">
                     {t('placeWise')}
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className={`grid gap-3 ${motorType === 'with' ? 'grid-cols-2' : 'grid-cols-1'}`}>
                     <CategoryCard
                       value="industrial"
                       icon={Factory}
@@ -946,28 +1100,36 @@ export default function FanSelectionApp() {
                       onSelect={(val) => {
                         setPlaceUseCase(val);
                         setCategory(val);
+                        // Auto-select direct drive if "with motor" is already selected
+                        if (motorType === 'with') {
+                          setDriveType('direct');
+                        }
                       }}
                     />
-                    <CategoryCard
-                      value="kitchen"
-                      icon={Utensils}
-                      title={t('kitchenTitle')}
-                      description={t('kitchenDesc')}
-                      onSelect={(val) => {
-                        setPlaceUseCase(val);
-                        setCategory(val);
-                      }}
-                    />
-                    <CategoryCard
-                      value="bathroom"
-                      icon={Home}
-                      title={t('bathroomTitle')}
-                      description={t('bathroomDesc')}
-                      onSelect={(val) => {
-                        setPlaceUseCase(val);
-                        setCategory(val);
-                      }}
-                    />
+                    {motorType === 'with' && (
+                      <>
+                        <CategoryCard
+                          value="kitchen"
+                          icon={Utensils}
+                          title={t('kitchenTitle')}
+                          description={t('kitchenDesc')}
+                          onSelect={(val) => {
+                            setPlaceUseCase(val);
+                            setCategory(val);
+                          }}
+                        />
+                        <CategoryCard
+                          value="bathroom"
+                          icon={Home}
+                          title={t('bathroomTitle')}
+                          description={t('bathroomDesc')}
+                          onSelect={(val) => {
+                            setPlaceUseCase(val);
+                            setCategory(val);
+                          }}
+                        />
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1005,10 +1167,10 @@ export default function FanSelectionApp() {
                 </div>
               )}
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 justify-center">
                 <button
                   onClick={() => setStep(2)}
-                  className="px-6 py-3 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
+                  className="px-6 py-2 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" /> {t('back')}
                 </button>
@@ -1020,7 +1182,7 @@ export default function FanSelectionApp() {
                     setStep(4);
                   }}
                   disabled={!placeUseCase || (placeUseCase === 'industrial' && !driveType)}
-                  className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {t('next')} <ArrowRight className="w-4 h-4" />
                 </button>
@@ -1034,7 +1196,7 @@ export default function FanSelectionApp() {
                 {t('guidedUseCaseTitle')}
               </h2>
               <p className="text-gray-600 mb-6">{t('guidedUseCaseDesc')}</p>
-              <div className="grid md:grid-cols-3 gap-4 mb-6">
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
                 <CategoryCard
                   value="kitchen"
                   icon={Utensils}
@@ -1057,30 +1219,11 @@ export default function FanSelectionApp() {
                     setStep(4);
                   }}
                 />
-                <CategoryCard
-                  value="industrial"
-                  icon={Factory}
-                  title={t('industrialGuidedTitle')}
-                  description="We will handle this as a manual query"
-                  onSelect={(val) => {
-                    setPlaceUseCase(val);
-                    setCategory(val);
-                    // Directly go to recommendations with query form
-                    setRequirementSummary({
-                      volume: null,
-                      requiredAirflow: null,
-                      recommendations: [],
-                      allMatches: 0,
-                      guidedIndustrial: true,
-                    });
-                    setStep(7);
-                  }}
-                />
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-3 justify-center">
                 <button
                   onClick={() => setStep(2)}
-                  className="px-6 py-3 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
+                  className="px-6 py-2 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" /> {t('back')}
                 </button>
@@ -1165,31 +1308,31 @@ export default function FanSelectionApp() {
                     </div>
                   </div>
                 )}
-              <div className="flex gap-3">
+              <div className="flex gap-3 justify-center">
                 <button
                   onClick={() => setStep(3)}
-                  className="px-6 py-3 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
+                  className="px-6 py-2 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" /> {t('back')}
                 </button>
                 {userType === 'expert' ? (
                   <button
                     onClick={() => setStep(5)}
-                    className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
                   >
                     {t('next')} <ArrowRight className="w-4 h-4" />
                   </button>
                 ) : (
                   <button
-                    onClick={() => handleSearch()}
+                    onClick={() => setStep(5)}
                     disabled={
                       !roomDimensions.length ||
                       !roomDimensions.width ||
                       !roomDimensions.height
                     }
-                    className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
                   >
-                    {t('showFans')} <ArrowRight className="w-4 h-4" />
+                    {t('next')} <ArrowRight className="w-4 h-4" />
                   </button>
                 )}
               </div>
@@ -1263,10 +1406,10 @@ export default function FanSelectionApp() {
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 justify-center">
                 <button
                   onClick={() => setStep(4)}
-                  className="px-6 py-3 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
+                  className="px-6 py-2 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" /> {t('back')}
                 </button>
@@ -1278,9 +1421,63 @@ export default function FanSelectionApp() {
                     userType === 'expert' &&
                     (!roomDimensions.length || !roomDimensions.width || !roomDimensions.height)
                   }
-                  className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {t('next')} <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 5: Noise Sensitivity (guided only) */}
+          {step === 5 && userType === 'guided' && (
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-2xl font-bold mb-6">{t('noiseTitle')}</h2>
+              <p className="text-gray-600 mb-6">
+                Choose your noise preference for the fan
+              </p>
+              <div className="space-y-3 mb-6">
+                <button
+                  onClick={() => {
+                    setNoiseSensitivity('moderate');
+                    handleSearch();
+                    setStep(7);
+                  }}
+                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                    noiseSensitivity === 'moderate'
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-blue-300'
+                  }`}
+                >
+                  <div className="font-bold mb-1">{t('noiseModerate')}</div>
+                  <div className="text-sm text-gray-600">
+                    {t('noiseModerateDesc')}
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    setNoiseSensitivity('quiet');
+                    handleSearch();
+                    setStep(7);
+                  }}
+                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                    noiseSensitivity === 'quiet'
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-blue-300'
+                  }`}
+                >
+                  <div className="font-bold mb-1">{t('noiseQuiet')}</div>
+                  <div className="text-sm text-gray-600">
+                    {t('noiseQuietDesc')}
+                  </div>
+                </button>
+              </div>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={() => setStep(4)}
+                  className="px-6 py-2 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" /> {t('back')}
                 </button>
               </div>
             </div>
@@ -1331,21 +1528,19 @@ export default function FanSelectionApp() {
                   </div>
                 </button>
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-3 justify-center">
                 <button
                   onClick={() => setStep(5)}
-                  className="px-6 py-3 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
+                  className="px-6 py-2 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" /> {t('back')}
                 </button>
-              </div>
-              <div className="flex gap-3 mt-3">
                 <button
                   onClick={() => {
                     handleSearch();
                     setStep(7);
                   }}
-                  className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center gap-2"
                 >
                   {t('findFans')} <Search className="w-4 h-4" />
                 </button>
@@ -1457,16 +1652,16 @@ export default function FanSelectionApp() {
                   </div>
                 )}
 
-                <div className="mt-6 flex gap-3">
+                <div className="mt-6 flex gap-3 justify-center">
                   <button
                     onClick={() => setStep(4)}
-                    className="px-6 py-3 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
+                    className="px-6 py-2 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center gap-2"
                   >
                     <ArrowLeft className="w-4 h-4" /> Adjust Filters
                   </button>
                   <button
                     onClick={resetSearch}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
                   >
                     Start Over
                   </button>
@@ -1498,6 +1693,40 @@ export default function FanSelectionApp() {
               </div>
             </div>
           )}
+          </>
+          )}
+
+          {currentTab === 'inquiry' && <InquiryPage />}
+
+          {/* Bottom Tab Navigation */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex">
+                <button
+                  onClick={() => setCurrentTab('selector')}
+                  className={`flex-1 flex flex-col items-center justify-center py-3 px-4 transition-colors ${
+                    currentTab === 'selector'
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <Wind className="w-6 h-6 mb-1" />
+                  <span className="text-xs font-semibold">{t('tabSelector')}</span>
+                </button>
+                <button
+                  onClick={() => setCurrentTab('inquiry')}
+                  className={`flex-1 flex flex-col items-center justify-center py-3 px-4 transition-colors ${
+                    currentTab === 'inquiry'
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <MessageSquare className="w-6 h-6 mb-1" />
+                  <span className="text-xs font-semibold">{t('tabInquiry')}</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </FanContext.Provider>
